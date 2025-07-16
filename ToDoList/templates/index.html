@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 할 일 목록</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .add-task-form {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .add-task-form input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        .add-task-form button {
+            padding: 10px 15px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        .add-task-form button:hover {
+            background-color: #4cae4c;
+        }
+        .message-area {
+            margin-top: -10px; /* 폼과의 간격 조절 */
+            margin-bottom: 20px; /* 다음 요소와의 간격 조절 */
+            text-align: center; /* 메시지 중앙 정렬 (선택 사항) */
+        }
+        .flashes {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            color: red; /* 경고 메시지를 빨간색으로 */
+            font-weight: bold;
+        }
+        .flashes li {
+            margin-bottom: 5px;
+        }
+        .filter-buttons {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .filter-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            margin: 0 5px;
+            border: 1px solid #007bff;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #007bff;
+            background-color: #fff;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover {
+            background-color: #e7f3ff;
+        }
+        .filter-btn.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        .task-item.completed .task-content {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .task-checkbox {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+        .task-content {
+            flex-grow: 1;
+            font-size: 18px;
+            color: #333;
+        }
+        .task-actions {
+            margin-left: auto;
+        }
+        .task-actions a {
+            text-decoration: none;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .task-actions .delete-btn {
+            background-color: #d9534f;
+        }
+        .task-actions .delete-btn:hover {
+            background-color: #c9302c;
+        }
+        .task-actions .edit-btn {
+            background-color: #0275d8;
+        }
+        .task-actions .edit-btn:hover {
+            background-color: #025aa5;
+        }
+        .task-priority {
+            font-size: 14px;
+            margin-left: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: white;
+        }
+        .priority-낮음 {
+            background-color: #6c757d; /* 회색 */
+        }
+        .priority-보통 {
+            background-color: #007bff; /* 파란색 */
+        }
+        .priority-높음 {
+            background-color: #dc3545; /* 빨간색 */
+        }
+        .clear-completed-form {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .clear-completed-btn {
+            padding: 10px 15px;
+            background-color: #f0ad4e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        .clear-completed-btn:hover {
+            background-color: #ec971f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>나의 할 일 목록</h1>
+
+        <form class="add-task-form" action="{{ url_for('add_task') }}" method="POST">
+            <input type="text" name="content" placeholder="새로운 할 일을 입력하세요" required>
+            <select name="priority" class="priority-select">
+                <option value="낮음">낮음</option>
+                <option value="보통" selected>보통</option>
+                <option value="높음">높음</option>
+            </select>
+            <button type="submit">추가</button>
+        </form>
+
+        <div class="message-area">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <div class="filter-buttons">
+            <a href="{{ url_for('index', filter='all') }}" class="filter-btn {% if current_filter == 'all' %}active{% endif %}">모든 할 일</a>
+            <a href="{{ url_for('index', filter='active') }}" class="filter-btn {% if current_filter == 'active' %}active{% endif %}">진행 중인 할 일</a>
+            <a href="{{ url_for('index', filter='completed') }}" class="filter-btn {% if current_filter == 'completed' %}active{% endif %}">완료된 할 일</a>
+        </div>
+
+        <ul class="task-list">
+            {% for task in tasks %}
+            <li class="task-item {% if task.completed %}completed{% endif %}">
+                <input type="checkbox" class="task-checkbox" {% if task.completed %}checked{% endif %} onclick="window.location.href='{{ url_for('complete_task', task_id=task.id) }}'">
+                <span class="task-content">{{ task.content }}</span>
+                <span class="task-priority priority-{{ task.priority.lower() }}">[{{ task.priority }}]</span>
+                <div class="task-actions">
+                    <a href="{{ url_for('edit_task', task_id=task.id) }}" class="edit-btn">수정</a>
+                    <a href="{{ url_for('delete_task', task_id=task.id) }}" class="delete-btn">삭제</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <form action="{{ url_for('clear_completed') }}" method="POST" class="clear-completed-form">
+            <button type="submit" class="clear-completed-btn">완료된 할 일 모두 삭제</button>
+        </form>
+    </div>
+</body>
+</html>

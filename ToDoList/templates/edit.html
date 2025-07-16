@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>할 일 수정</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .edit-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .edit-form label {
+            font-size: 18px;
+            color: #555;
+            text-align: left;
+            margin-bottom: 5px;
+        }
+        .edit-form input[type="text"] {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .edit-form button {
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+        .edit-form button:hover {
+            background-color: #0056b3;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .flashes {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            color: red; /* 경고 메시지를 빨간색으로 */
+            font-weight: bold;
+        }
+        .flashes li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>할 일 수정</h1>
+        {% if task %}
+        <form class="edit-form" action="{{ url_for('edit_task', task_id=task.id) }}" method="POST">
+            <label for="content">할 일 내용:</label>
+            <input type="text" id="content" name="content" value="{{ task.content }}" required>
+
+            <label for="priority">우선순위:</label>
+            <select id="priority" name="priority">
+                <option value="낮음" {% if task.priority == '낮음' %}selected{% endif %}>낮음</option>
+                <option value="보통" {% if task.priority == '보통' %}selected{% endif %}>보통</option>
+                <option value="높음" {% if task.priority == '높음' %}selected{% endif %}>높음</option>
+            </select>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
+            <button type="submit">수정 완료</button>
+        </form>
+        {% else %}
+        <p>할 일을 찾을 수 없습니다.</p>
+        {% endif %}
+        <a href="{{ url_for('index') }}" class="back-link">목록으로 돌아가기</a>
+    </div>
+</body>
+</html>
