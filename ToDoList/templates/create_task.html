@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>할 일 수정</title>
+    <title>새 할 일 추가</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -29,18 +29,23 @@
             color: #333;
             margin-bottom: 30px;
         }
-        .edit-form {
+        .add-task-form {
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
-        .edit-form label {
+        .form-group {
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
             font-size: 18px;
             color: #555;
-            text-align: left;
-            margin-bottom: 5px;
         }
-        .edit-form input[type="text"] {
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group select {
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -48,9 +53,9 @@
             width: 100%;
             box-sizing: border-box;
         }
-        .edit-form button {
+        button {
             padding: 12px 20px;
-            background-color: #007bff;
+            background-color: #5cb85c;
             color: white;
             border: none;
             border-radius: 4px;
@@ -59,8 +64,8 @@
             transition: background-color 0.2s;
             margin-top: 10px;
         }
-        .edit-form button:hover {
-            background-color: #0056b3;
+        button:hover {
+            background-color: #4cae4c;
         }
         .back-link {
             display: block;
@@ -76,7 +81,7 @@
             list-style: none;
             padding: 0;
             margin: 10px 0;
-            color: red; /* 경고 메시지를 빨간색으로 */
+            color: red;
             font-weight: bold;
         }
         .flashes li {
@@ -86,39 +91,43 @@
 </head>
 <body>
     <div class="container">
-        <h1>할 일 수정</h1>
-        {% if task %}
-        <form class="edit-form" action="{{ url_for('edit_task', task_id=task.id) }}" method="POST">
-            <label for="content">할 일 내용:</label>
-            <input type="text" id="content" name="content" value="{{ task.content }}" required>
-
-            <label for="priority">우선순위:</label>
-            <select id="priority" name="priority">
-                <option value="낮음" {% if task.priority == '낮음' %}selected{% endif %}>낮음</option>
-                <option value="보통" {% if task.priority == '보통' %}selected{% endif %}>보통</option>
-                <option value="높음" {% if task.priority == '높음' %}selected{% endif %}>높음</option>
-            </select>
-
-            <label for="start_date">시작일:</label>
-            <input type="date" id="start_date" name="start_date" value="{{ task.start_date if task.start_date else '' }}">
-
-            <label for="end_date">마감일:</label>
-            <input type="date" id="end_date" name="end_date" value="{{ task.end_date if task.end_date else '' }}">
-
-            {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                <ul class="flashes">
-                {% for message in messages %}
-                    <li>{{ message }}</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-            {% endwith %}
-            <button type="submit">수정 완료</button>
-        </form>
-        {% else %}
-        <p>할 일을 찾을 수 없습니다.</p>
+        <h1>새 할 일 추가</h1>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
         {% endif %}
+        {% endwith %}
+        <form class="add-task-form" action="{{ url_for('create_task') }}" method="POST">
+            <div class="form-group">
+                <label for="content">할 일 내용:</label>
+                <input type="text" id="content" name="content" placeholder="할 일 내용을 입력하세요" required>
+            </div>
+
+            <div class="form-group">
+                <label for="priority">우선순위:</label>
+                <select id="priority" name="priority">
+                    <option value="낮음">낮음</option>
+                    <option value="보통" selected>보통</option>
+                    <option value="높음">높음</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="start_date">시작일:</label>
+                <input type="date" id="start_date" name="start_date">
+            </div>
+
+            <div class="form-group">
+                <label for="end_date">마감일:</label>
+                <input type="date" id="end_date" name="end_date">
+            </div>
+
+            <button type="submit">할 일 추가</button>
+        </form>
         <a href="{{ url_for('index') }}" class="back-link">목록으로 돌아가기</a>
     </div>
 </body>

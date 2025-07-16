@@ -1,0 +1,11 @@
+feat: Implement priority, filtering, and clear completed tasks; improve UX and project docs.
+
+This commit introduces several new features to the ToDo List application:
+
+- **Priority Setting**: Users can now assign 'Low', 'Medium', or 'High' priority to tasks.
+- **Task Filtering**: Added options to filter tasks by 'All', 'Active', or 'Completed' status.
+- **Clear Completed Tasks**: A new button allows users to delete all completed tasks at once.
+- **Improved UX**: Enhanced error handling for duplicate task additions and edits, with clear warning messages displayed directly on the respective pages.
+- **Project Management**: Added `PROJECT_STATUS.md` to track project progress and updated `README.md` with new features and improved setup instructions.
+
+This commit also includes minor code refactorings for better database connection management.

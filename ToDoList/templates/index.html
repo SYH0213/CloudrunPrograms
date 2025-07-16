@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>나의 할 일 목록</title>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -173,21 +174,30 @@
         .clear-completed-btn:hover {
             background-color: #ec971f;
         }
+        /* Calendar specific styles */
+        #calendar {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div style="text-align: right; margin-bottom: 10px;">
+            {% if nickname %}
+                <span>환영합니다, {{ nickname }}님!</span>
+                <a href="{{ url_for('logout') }}" style="margin-left: 10px; text-decoration: none; color: #007bff;">로그아웃</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" style="text-decoration: none; color: #007bff;">로그인</a>
+                <a href="{{ url_for('register') }}" style="margin-left: 10px; text-decoration: none; color: #007bff;">회원가입</a>
+            {% endif %}
+        </div>
         <h1>나의 할 일 목록</h1>
 
-        <form class="add-task-form" action="{{ url_for('add_task') }}" method="POST">
-            <input type="text" name="content" placeholder="새로운 할 일을 입력하세요" required>
-            <select name="priority" class="priority-select">
-                <option value="낮음">낮음</option>
-                <option value="보통" selected>보통</option>
-                <option value="높음">높음</option>
-            </select>
-            <button type="submit">추가</button>
-        </form>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="{{ url_for('create_task') }}" style="padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px;">새 할 일 추가</a>
+        </div>
 
         <div class="message-area">
             {% with messages = get_flashed_messages() %}
@@ -203,7 +213,7 @@
 
         <div class="filter-buttons">
             <a href="{{ url_for('index', filter='all') }}" class="filter-btn {% if current_filter == 'all' %}active{% endif %}">모든 할 일</a>
-            <a href="{{ url_for('index', filter='active') }}" class="filter-btn {% if current_filter == 'active' %}active{% endif %}">진행 중인 할 일</a>
+            <a href="{{ url_for('index', filter='active') }}" class="filter-btn {% if current_filter == 'active' %}active{% endif %}>진행 중인 할 일</a>
             <a href="{{ url_for('index', filter='completed') }}" class="filter-btn {% if current_filter == 'completed' %}active{% endif %}">완료된 할 일</a>
         </div>
 
@@ -224,6 +234,29 @@
         <form action="{{ url_for('clear_completed') }}" method="POST" class="clear-completed-form">
             <button type="submit" class="clear-completed-btn">완료된 할 일 모두 삭제</button>
         </form>
+
+        <div id='calendar'></div>
     </div>
+
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: '/calendar_events',
+                eventClick: function(info) {
+                    // 클릭 시 해당 할 일 수정 페이지로 이동
+                    window.location.href = '/edit/' + info.event.id;
+                }
+            });
+            calendar.render();
+        });
+    </script>
 </body>
 </html>
